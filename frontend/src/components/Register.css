@@ -1,0 +1,125 @@
+body{
+    /* background-color: black; */
+    margin: 0px;
+    padding: 0px;
+}
+.registerbox{
+    background-color: #b3c7d252;
+    display: flex;
+    height: 100vh;
+}
+.registerbody{
+    display: flex;
+    flex-direction: column;
+    margin: auto;
+    width: 500px;
+    height: 450px;
+    border-radius: 50px;
+    background-color: #d4d7e3;
+    text-align: center;
+    font-family: 'Courier New', Courier, monospace;
+}
+
+.registerbody h1{
+    /* background-color: #d4d7e3; */
+    /* color: white; */
+    /* font-family: 'Courier New', Courier, monospace; */
+    font-size: 55px;
+}
+.registerbody form{
+    display: flex;
+    flex-direction: column;
+}
+.inputdiv{
+    /* background-color: aqua; */
+    background-color: white;
+    height: 50px;
+    display: flex;
+    /* flex-direction: row; */
+    justify-content: space-between;
+    width: 425px;
+    margin: auto;
+    margin-bottom: 15px;
+    border-radius: 50px;
+    border: none;
+}
+.inputdiv input{
+    /* margin: auto; */
+    width: 95%;
+    height: 95%;
+    border: none;
+    background-color: transparent;
+    outline: none;
+    font-family: 'Courier New', Courier, monospace;
+}
+
+.inputdiv div{
+    /* background-color: blue; */
+    width: 50px;
+    display: flex;
+}
+.material-symbols-outlined {
+    margin: auto;
+    color: #292e47;
+  font-variation-settings:
+  'FILL' 0,
+  'wght' 400,
+  'GRAD' 0,
+  'opsz' 24
+}
+.loginbtn{
+    margin: auto;
+    margin-bottom: 15px;
+    width: 300px;
+    height: 50px;
+    border-radius: 50px;
+    background-color: #292e47;
+    color: white;
+    font-family: 'Courier New', Courier, monospace;
+    font-size: 18px;
+    border: none;
+    outline: none;
+    transition: transform 100ms;
+}
+.registerbody button:hover{
+    cursor: pointer;
+    
+}
+.signupbtn{
+    margin: auto;
+    margin-bottom: 15px;
+    width: 300px;
+    height: 50px;
+    border-radius: 50px;
+    font-family: 'Courier New', Courier, monospace;
+    font-size: 18px;
+    border: none;
+    outline: none;
+    transition: transform 100ms;
+}
+.loginbtn:hover{
+    transform: scale(1.05);
+}
+.loginbtn:active{
+    transform : scale(0.8)
+}
+.signupbtn:active{
+    transform : scale(0.8)
+}
+.signupbtn:hover{
+    transform: scale(1.05);
+}
+@media screen and (max-width : 500px) {
+    .registerbody{
+        width: 90%
+    }
+    .inputdiv{
+        width: 90%;
+    }
+    .loginbtn{
+        width: 50%;
+    }
+    .signupbtn{
+        width: 50%;
+    }
+}

@@ -1,0 +1,35 @@
+{
+  "type": "module",
+  "name": "pccontrollappserver",
+  "version": "1.0.0",
+  "description": "server for pwp's app for pc control",
+  "main": "server.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/kumarvivek9088/pccontrolapp.git"
+  },
+  "keywords": [
+    "pccontrolapp",
+    "python",
+    "app",
+    "nodejs",
+    "server",
+    "reactjs"
+  ],
+  "author": "Vivek Kumar aka Progress with Python",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/kumarvivek9088/pccontrolapp/issues"
+  },
+  "homepage": "https://github.com/kumarvivek9088/pccontrolapp#readme",
+  "dependencies": {
+    "bcrypt": "^5.1.1",
+    "express": "^4.18.2",
+    "jsonwebtoken": "^9.0.2",
+    "mongoose": "^8.1.0",
+    "uuid": "^9.0.1"
+  }
+}
