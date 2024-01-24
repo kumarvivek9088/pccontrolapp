@@ -22,6 +22,7 @@ span{
     /* background-color: white; */
     height: 90vh;
     width: 70vw;
+    /* width: 80vw; */
 }
 
 .homecontainer{
@@ -29,6 +30,8 @@ span{
     margin: auto;
     /* margin-right: 0; */
     /* width: 900px; */
+    /* width: 60vw; */
+    /* width: 90%; */
     width: 60vw;
     height: 90vh;
     border-radius: 50px;
@@ -37,16 +40,33 @@ span{
     font-family: 'Courier New', Courier, monospace;
     z-index: 1;
     position: relative;
+    /* justify-content: space-between; */
 }
 
-.botsmenu{
+.menu{
     width: 40%;
     height: 100%;
-    /* background-color: aqua; */
+    /* background-color: yellow; */
+    position: relative;
+    display: flex;
+    flex-direction: column-reverse;
+    align-items: flex-end;
     border-top-left-radius: 50px;
     border-bottom-left-radius: 50px;
     border-right: 3px solid #292e47;
+    /* overflow-y: scroll; */
+}
+
+.botsmenu{
+    width: 100%;
+    height: 100%;
+    position: absolute;
+    /* background-color: green; */
+    border-top-left-radius: 50px;
+    border-bottom-left-radius: 50px;
+    /* border-right: 3px solid #292e47; */
     overflow-y: scroll;
+    /* opacity: 0.5; */
 }
 .botsmenu::-webkit-scrollbar{
     display: none;
@@ -54,7 +74,9 @@ span{
 }
 .botsmenu h1{
     /* height: 81.5px; */
-    height: 75px;
+    /* height: 75px; */
+    width: 100%;
+    height: 12.45%;
     /* background-color: #d4d7e3; */
     border-bottom: 3px solid #292e47;
     margin: 0;
@@ -63,6 +85,7 @@ span{
     flex-direction: column;
     justify-content: center;
     /* background-color: aqua; */
+    border-top-left-radius: 50px;
 }
 
 .botchatbox{
@@ -142,6 +165,11 @@ span{
     display: flex;
     overflow-x: scroll;
     overflow-y: hidden;
+    cursor: pointer;
+    transition: all 500ms;
+}
+.userbots:active{
+    opacity: 0.5;
 }
 .userbots::-webkit-scrollbar{
     display: none;
@@ -192,8 +220,8 @@ span{
     /* background-color: orange; */
 }
 .chatheader{
-    height: 75px;
-    /* height: 12.45%; */
+    /* height: 75px; */
+    height: 12.45%;
     /* height: 10vh; */
     /* background-color: blue; */
     border-bottom: 3px solid #292e47;
@@ -286,6 +314,12 @@ span{
     height: 85%;
     /* background-color: yellow; */
     overflow: scroll;
+    display: flex;
+    flex-direction: column-reverse;
+}
+.messagecontainer{
+    /* background-color: red; */
+    height: auto;
 }
 .submessagebox::-webkit-scrollbar{
     display: none;
@@ -445,9 +479,10 @@ span{
     -webkit-user-select: none;
     -ms-user-select: none;
     user-select: none;
-}
-.submessageinputbox span:hover{
     cursor: pointer;
+}
+.submessageinputbox span:active{
+    transform: scale(0.8);
 }
 .chatheaderbotpic{
     /* font-size: xx-large; */
@@ -461,14 +496,114 @@ span{
 .backarrow{
     display: none;
 }
-
-
+.createroom{
+    position: absolute;
+    display: flex;
+    width: 100%;
+    height: 100%;
+    z-index: 12;
+    /* background-color: yellow; */
+    background-color: #292e4765;
+    border-radius: 50px;
+    /* opacity: 0.5; */
+}
+.subcreateroom{
+    margin: auto;
+    /* width: 60vw; */
+    width: 40%;
+    height: 30%;
+    background-color: white;
+    display: flex;
+    flex-direction: column;
+    /* justify-content: center; */
+    border-radius: 25px;
+    border: 2px solid #292e47;
+}
+.subcreateroom input{
+    outline: none;
+    /* border: none; */
+    border-radius: 50px;
+    border: 2px solid #292e47;
+    height: 30px;
+    text-align: center;
+    margin: auto;
+    width: 80%;
+}
+.subcreateroom button {
+    width: 50%;
+    margin: auto;
+    height: 30px;
+    border-radius: 25px;
+    outline: none;
+    border: none;
+    background-color: #292e47;
+    color: white;
+    transition: opacity 500ms;
+}
+.subcreateroom button:active{
+    opacity: 0.5;
+}
+.subcreateroom span{
+    margin: auto 0;
+    padding: 0;
+    /* background-color: aqua ; */
+    width: fit-content;
+}
+.mobilescreencreateroomclose{
+    display: none;
+}
+.bigscreencreateroomclose{
+    display: block;
+}
+.subcreateroom p{
+    margin: 0;
+    padding: 0;
+}
+@media screen and (max-width: 1024px){
+    .mainhomecontainer{
+        /* background-color: orange; */
+        width: 90vw;
+    }
+    .homecontainer{
+        width: 80vw;
+    }
+}
+@media screen and (max-width: 900px) {
+    .mainhomecontainer{
+        width: 100vw;
+    }
+    .homecontainer{
+        width: 90vw;
+    }
+}
 @media screen and (max-width : 800px) {
    .mainhomecontainer{
-    width: 100vw;
+    width: 100%;
+    height: 100%;
+    background-color: white;
    }
    .homecontainer{
     width: 100%;
+    height: 100%;
+    border-radius: 0;
+   }
+   .botchatbox{
+    border-radius: 0;
+   }
+   .chatheader{
+    border-radius: 0;
+   }
+   .submessagebox{
+    border-radius: 0;
+   }
+   .messageinputbox{
+    border-radius: 0;
+   }
+   .botsmenu{
+    border-radius: 0;
+   }
+   .menu{
+    border-radius: 0;
    }
    .actionbox{
     display: none;
@@ -476,6 +611,72 @@ span{
    .chatheaderbotpic{
     font-size: 8vh;
    }
+   .createroom{
+    border-radius: 0;
+   }
+   .overlaybox{
+    position: absolute;
+    /* height: 100%; */
+    height: fit-content;
+    /* height: 100%;
+    width: 100%; */
+    /* width: 35%; */
+    /* display: block; */
+    z-index: 10;
+    /* background-color: yellow; */
+    /* opacity: 0.2; */
+    /* background-color: yellow; */
+    display: flex;
+    /* background: none; */
+    flex-direction: column-reverse;
+    /* background: transparent */
+    /* display: none; */
+    }
+    .suboverlaybox{
+        margin-left: auto;
+        width: 100%;
+        /* height: 20%; */
+        /* background-color: orange; */
+        display: flex;
+        flex-direction: column;
+        opacity: 1;
+        width: fit-content;
+        /* background-color: aqua; */
+    }
+    .overlaymenu{
+        margin: auto;
+        /* margin-left: auto; */
+        width: 30vw;
+        /* width: 100%; */
+        /* width: 150px; */
+        /* height: 20vh; */
+        /* background-color: yellowgreen; */
+        background-color: white;
+        border: 1px solid gray;
+        border-radius: 10%;
+    }
+    .overlay-symbol{
+        /* background-color: green; */
+        font-size: 10vh;
+        -webkit-touch-callout: none;
+        -webkit-user-select: none;
+        -khtml-user-select: none;
+        -moz-user-select: none;
+        -ms-user-select: none;
+        user-select: none;
+        -webkit-tap-highlight-color: rgba(0,0,0,0);
+        transition: opacity 50ms;
+    }
+    .overlay-symbol:active{
+        /* transform: scale(0.8); */
+        opacity: 0.5;
+    }
+    .bigscreencreateroomclose{
+        display: none;
+    }
+    .mobilescreencreateroomclose{
+        display: block;
+    }
    
 }
 
@@ -484,18 +685,20 @@ span{
 @media screen and (max-width : 500px) {
     .mainhomecontainer{
         display: block;
-        height: 100vh;
+        height: 100%;
+        width: 100%;
     }
     .homecontainer{
         /* display: block; */
         border-radius: 0;
-        height: 100vh;
+        width: 100%;
+        height: 100%;
         /* height: 100%; */
         /* width: 100vw; */
         position: relative;
         display: flex;
-        flex-direction: column-reverse;
-        align-items: flex-end;
+        /* flex-direction: column-reverse;
+        align-items: flex-end; */
     }
     .botchatbox{
         display: none;
@@ -508,6 +711,7 @@ span{
     .chatheader{
         border-radius: 0;
         background-color: #292e47;
+        height: 75px;
     }
     .botpic li{
         color: #292e47;
@@ -517,6 +721,15 @@ span{
         color: white;
         font-size: 8vh;
         /* color: #292e47; */
+    }
+    .menu{
+        width: 100%;
+        height: 100%;
+        background-color: aqua;
+        display: flex;
+        flex-direction: column-reverse;
+        align-items: flex-end;
+
     }
     .botsmenu{
         width: 100%;
@@ -532,11 +745,14 @@ span{
         background-color: #292e47;
         border-radius: 0;
         color: white;
+        height: 75px;
     }
     .overlaybox{
         position: absolute;
         /* height: 100%; */
         height: fit-content;
+        /* height: 100%;
+        width: 100%; */
         /* width: 35%; */
         /* display: block; */
         z-index: 10;
@@ -552,7 +768,7 @@ span{
     .suboverlaybox{
         margin-left: auto;
         width: 100%;
-        height: 20%;
+        /* height: 20%; */
         /* background-color: orange; */
         display: flex;
         flex-direction: column;
@@ -562,6 +778,7 @@ span{
     }
     .overlaymenu{
         margin: auto;
+        /* margin-left: auto; */
         width: 35vw;
         /* width: 150px; */
         /* height: 20vh; */
@@ -614,6 +831,7 @@ span{
         z-index: 12;
         /* background-color: yellow; */
         /* opacity: 0.5; */
+        border-radius: 0;
     }
     .subcreateroom{
         margin: auto;
@@ -659,5 +877,13 @@ span{
         margin: 0;
         padding: 0;
     }
+    .bigscreencreateroomclose{
+        display: none;
+    }
+    .mobilescreencreateroomclose{
+        display: block;
+    }
     
 }
+
+
