@@ -289,11 +289,12 @@ span{
     padding: 4% 0;
     display: flex;
     justify-content: center;
+    cursor: pointer;
 }
 .dotmenuitems p{
     color: black;
 }
-.dotmenucontainer:active{
+.dotmenuitems p:active{
     transform: scale(0.8);
 }
 .lastmessage p{
@@ -558,6 +559,11 @@ span{
 .subcreateroom p{
     margin: 0;
     padding: 0;
+}
+.receivemessageimage{
+    height: 50%;
+    width: 50%;
+    border-radius: 25px;
 }
 @media screen and (max-width: 1024px){
     .mainhomecontainer{

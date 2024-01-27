@@ -6,9 +6,29 @@ import jwt from "jsonwebtoken";
 import { v4 } from "uuid";
 import auth from "./auth.js";
 import roomsModel from "./db/roomsModel.js";
+import http from 'http';
+import cors from 'cors';
+import {Server} from 'socket.io';
+import dotenv from 'dotenv';
+dotenv.config();
 const app = express();
-const port = 3000;
+const port = 3001;
 app.use(express.json());
+app.use(cors());
+var allowlist = ['http://localhost:3000','http://127.0.0.1:3000'];
+var corsConfig = function (req,callback){
+    var corsOptions;
+    if (allowlist.indexOf(req.header('Origin')) !== -1){
+        corsOptions = {
+            origin : true
+        }
+    }else{
+        corsOptions = {
+            origin: false
+        }
+    }
+    callback(null,corsOptions)
+}
 dbConnect();
 app.get('/',auth,(req,res)=>{
     res.status(200).send({
@@ -16,7 +36,42 @@ app.get('/',auth,(req,res)=>{
         email : req.user.email
     })
 })
+app.get('/test',(req,res)=>{
+    res.status(200).send({
+        "message":"hello server is up"
+    })
+})
+const server = http.createServer(app);
+const io = new Server(server,{
+    cors: {
+        origin : ['http://localhost:3000','http://127.0.0.1:3000'],
+        methods : ['GET','POST'],
+    },
+});
+io.on("connection",(socket)=>{
+    console.log('user connected' ,socket.id);
+    socket.on('join_room',(data)=>{
+        const {username,room} = data;
+        // console.log(data.room);
+        console.log(data);
+        socket.join(room);
+        console.log("user connected to room",username,room);
+    });
+    socket.on('send_message',(data)=>{
+        // const {username,room,message} = data;
+        console.log(data);
+        console.log(data.room);
+        io.in(data.room).emit('receive_message',data);  
+    });
+    socket.on('leave',(room)=>{
+        console.log("leaving room",room);
+        socket.leave(room);
+    });
+    socket.on('disconnect',()=>{
+        console.log("user disconnected",socket.id);
+    })
 
+});
 
 app.post('/signup',(req,res)=>{
     bcrypt.hash(req.body.password,10)
@@ -38,7 +93,7 @@ app.post('/signup',(req,res)=>{
             const userexist  = userModel.findOne({email:req.body.email})
             console.log(userexist);
             if (userexist){
-                res.status(200).send({
+                res.status(400).send({
                     success:false,
                     "message": "User Already exist"
                 })
@@ -61,9 +116,9 @@ app.post('/signin',(req,res)=>{
         .then((passwordcheck)=>{
             // console.log("im here")
             if (!passwordcheck){
-                res.status(200).send({
+                res.status(400).send({
                     success:false,
-                    password:"password is incorrect"
+                    message:"password is incorrect"
                 });
             }
             else{
@@ -85,14 +140,14 @@ app.post('/signin',(req,res)=>{
             }
         })
         .catch((e)=>{
-            res.status(401).send({
+            res.status(400).send({
                 success: false,
                 message: e
             });
         });
     })
     .catch((e)=>{
-        res.status(200).send({
+        res.status(400).send({
             success:false,
             message:"email is incorrect"
         });
@@ -133,7 +188,7 @@ app.post("/createroom",auth,(req,res)=>{
 })
 
 
-app.get('/userrooms',auth,(req,res)=>{
+app.get('/userrooms',auth,cors(corsConfig),(req,res)=>{
     roomsModel.find({user:req.user.userid})
     .then((result)=>{
         res.send({
@@ -142,6 +197,9 @@ app.get('/userrooms',auth,(req,res)=>{
     })
 })
 
-app.listen(port,()=>{
-    console.log("server started");
+// app.listen(port,()=>{
+//     console.log("server started");
+// })
+server.listen(port,()=>{
+    console.log("server is up",port);
 })

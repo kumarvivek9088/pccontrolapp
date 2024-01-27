@@ -14,6 +14,10 @@ const roomsSchema = mongoose.Schema({
         type : String,
         required : [true, " "],
         unique : [true ," roomid must be unique"]
+    },
+    createdAt: {
+        type: Date,
+        default: Date.now
     }
 })
 

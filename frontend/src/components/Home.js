@@ -1,14 +1,61 @@
 import React from "react";
 import './Home.css';
-
+import axios from 'axios';
+import { useState, useEffect } from "react";
+import io from 'socket.io-client';
+// import {useNavigate} from 'react-router-dom';
+import {toast} from "react-toastify";
+import { useAuth } from "../context/Authorization";
 const Home = ()=>{
-    const enablechatdiv = ()=>{
+    const backendurl = process.env.REACT_APP_BACKEND_BASE_URL;
+    const useremail = 'vivek@gmail.com';
+    // console.log("backend url",backendurl);
+    const [userRooms,setuserRooms] = useState([]);
+    const [chatHistory,setchatHistory] = useState([]);
+    const [socket,setSocket] = useState(null);
+    const [roomId,setroomId] = useState("");
+    // const navigate = useNavigate();
+    const [authToken,setauthToken] = useAuth();
+    
+    // const authtoken = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyaWQiOiI2NWE2YzU2YzNmZGI2MmQwOTEyZTBlODciLCJlbWFpbCI6InZpdmVrQGdtYWlsLmNvbSIsIm5hbWUiOiJ2aXZlayIsImlhdCI6MTcwNjM2NjExOSwiZXhwIjoxNzA2NDUyNTE5fQ._SeIW9LyCtVzGQBaWrXC3e5ExTLQQDItBijat5IT6vQ'
+    useEffect(()=>{
+        axios.get(`${backendurl}/userrooms/`,{
+            headers:{
+                Authorization: `Bearer ${authToken}`,
+                "Content-Type":"application/json",
+            },
+        }).then((res)=> {
+            console.log(res.data.result);
+            setuserRooms(res.data.result);
+        })
+        .catch((err)=>console.error(err));
+        const socketInstance = io(backendurl);
+        setSocket(socketInstance);
+        return ()=>{
+            socketInstance.disconnect();
+        }
+    },[backendurl]);
+    const enablechatdiv = (botname,roomid)=>{
+        console.log("final socket",socket);
         console.log("chatmenu clicked")
         console.log(!document.getElementsByClassName("botchatbox")[0].style.display);
         let chatmenuboxdiv = document.getElementsByClassName("menu")[0];
         let homecontainerdiv = document.getElementsByClassName("homecontainer")[0];
         console.log(chatmenuboxdiv.offsetWidth ,homecontainerdiv.offsetWidth)
         if(document.getElementsByClassName("botchatbox")[0].style.display === 'none' || !document.getElementsByClassName("botchatbox")[0].style.display){
+            document.getElementById("chatheaderbotnamepid").innerHTML = botname;
+            let localhistory = JSON.parse(localStorage.getItem(`roomid${roomid}`));
+            if (localhistory === null){
+                setchatHistory([]);
+            }else{
+                setchatHistory(localhistory);
+            }
+            console.log("this is room",roomid);
+            setroomId(roomid);
+            console.log("roomid",roomId);
+            if( roomid !== null){
+                socket.emit('join_room',{username :useremail,room : roomid});
+            }
             if (chatmenuboxdiv.offsetWidth === homecontainerdiv.offsetWidth){
                 document.getElementsByClassName("botchatbox")[0].style.display='flex';
                 document.getElementsByClassName("menu")[0].style.display = 'none';
@@ -19,12 +66,20 @@ const Home = ()=>{
         }
         else{
             document.getElementsByClassName("botchatbox")[0].style.display='none';
+            setchatHistory([]);
+            // setroomId("");
+            socket.emit('leave',roomid);
         }
     }
+    // useEffect(()=>{
+    //     console.log("room id updated",roomId);
+    // },[roomId])
     const back = ()=>{
         document.getElementsByClassName("botchatbox")[0].style.display = 'none';
         document.getElementsByClassName("menu")[0].style.display = 'flex';
         document.getElementsByClassName("overlaybox")[0].style.display = 'flex';
+        console.log(roomId);
+        socket.emit('leave',roomId);
     }
     const triggerdotmenu = ()=>{
         let d = document.getElementsByClassName('dotmenucontainer')[0];
@@ -65,6 +120,35 @@ const Home = ()=>{
         document.getElementsByClassName("createroom")[0].style.display = 'none';
         assistantmenu();
     }
+    const sendMessage = ()=>{
+        let message = document.getElementById("sendmessageinput").value;
+        if (socket!==null && message.trim() !== ''){
+            socket.emit('send_message',{sender:useremail,room:roomId,message : message,type:"text"});
+        }
+    }
+    useEffect(()=>{
+        
+        // if (roomId !== null){
+        //     console.log("roomid is in joining room",roomId);
+        //     socket.emit('join_room',{username :useremail,room : "abc"});
+        if (socket!==null){
+            console.log("im in receiving message useeffect",roomId);
+            socket.on('receive_message',(data)=>{
+                console.log("received message",data);
+                setchatHistory(prevchatHistory=>[...prevchatHistory,data]);
+            })
+            return ()=> socket.off("receive_message");
+
+        }
+        // }
+    },[socket,roomId]);
+    const logout = ()=>{
+        localStorage.removeItem("authToken");
+        localStorage.removeItem("useremail");
+        toast.success("logout successfull");
+        setauthToken(null);
+        // navigate('/login');
+    }
     return (
         <>
             <div className="homebox">
@@ -79,7 +163,7 @@ const Home = ()=>{
                                     <div className="dotmenuitems" onClick={createnewroom}>
                                         <p>Create Room</p>
                                     </div>
-                                    <div className="dotmenuitems" >
+                                    <div className="dotmenuitems" onClick={logout}>
                                         <p>Logout</p>
                                     </div>
                                 </div>
@@ -120,6 +204,22 @@ const Home = ()=>{
                                         </div>
                                     </div>
                                 </div>
+                                {userRooms.map((room)=>(
+                                    <div key = {room.roomid} className="userbots" onClick={()=>enablechatdiv(room.name,room.roomid)}>
+                                        <div className="botpic">
+                                            <li className="material-symbols-outlined chatheaderbotpic">account_circle</li>
+                                        </div>
+                                        <div className="botname-lastmessage">
+                                            <div className="botname">
+                                                <p>{room.name}</p>
+                                                <span>{new Date(room.createdAt).toLocaleDateString()}</span>
+                                            </div>
+                                            <div className="lastmessage">
+                                                <p>{room.name} is there...</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                ))}
                             </div>
                         </div>
                         {/* <div className="overlaybox">
@@ -157,7 +257,7 @@ const Home = ()=>{
                                 </div>
                                 <div className="chatheaderbotname">
                                     <div className="subchatheaderbotname">
-                                        <p>Jarvis</p>
+                                        <p id="chatheaderbotnamepid">Jarvis</p>
                                         <span className="material-symbols-outlined"  onClick={triggerdotmenu}>more_vert</span>
                                          
                                     </div>
@@ -178,7 +278,7 @@ const Home = ()=>{
                             <div className="messagebox">
                                 <div className="submessagebox">
                                     <div className="messagecontainer">
-                                        <div className="receivemessagebox">
+                                        {/* <div className="receivemessagebox">
                                             <div className="receivemessagebackgroundbox">
                                                 <p>Hello boss</p>
                                             </div>
@@ -203,13 +303,42 @@ const Home = ()=>{
                                                 <p>hii dubara se...</p>
                                             </div>
                                         </div>
+                                        <div className="receivemessagebox">
+                                            <img alt="https://plus.unsplash.com/premium_photo-1676637000058-96549206fe71?w=1000&auto=format&fit=crop&q=60&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MXx8aW1hZ2V8ZW58MHx8MHx8fDA%3D" src="https://plus.unsplash.com/premium_photo-1676637000058-96549206fe71?w=1000&auto=format&fit=crop&q=60&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MXx8aW1hZ2V8ZW58MHx8MHx8fDA%3D" className="receivemessageimage" />
+                                        </div>
+                                        <div className="sendmessagebox">
+                                            <img alt="https://plus.unsplash.com/premium_photo-1676637000058-96549206fe71?w=1000&auto=format&fit=crop&q=60&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MXx8aW1hZ2V8ZW58MHx8MHx8fDA%3D" className="receivemessageimage" src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQ-A9ZO8y-_0ywop3QtydYaeBSWmmvJgg7inw&usqp=CAU" />
+                                        </div> */}
+                                        {chatHistory.map((history)=>(
+                                            history.sender == useremail?(
+                                                <div className="sendmessagebox">
+                                                    {history.type == 'text'?(
+                                                        <div className="sendmessagebackgroundbox">
+                                                            <p>{history.message}</p>
+                                                        </div>    
+                                                    ):(
+                                                        <img src = "" />
+                                                    )}
+                                                </div>
+                                            ):(
+                                                <div className="receivemessagebox">
+                                                    {history.type == 'text'?(
+                                                        <div className="receivemessagebackgroundbox">
+                                                            <p>{history.message}</p>
+                                                        </div>
+                                                    ):(
+                                                        <img src="" />
+                                                    )}
+                                                </div>
+                                            )
+                                        ))}
 
                                     </div>
                                 </div>
                                 <div className="messageinputbox">
                                     <div className="submessageinputbox">
-                                        <input type="text"  placeholder="message"/>
-                                        <span class="material-symbols-outlined">send</span>
+                                        <input type="text"  id = "sendmessageinput" placeholder="message"/>
+                                        <span class="material-symbols-outlined" onClick={sendMessage}>send</span>
                                     </div>
                                 </div>
                             </div>
@@ -221,7 +350,7 @@ const Home = ()=>{
                                 <div className="actionsmenuitems">
                                     <p onClick={createnewroom}>Create Room</p>
                                 </div>
-                                <div className="actionsmenuitems">
+                                <div className="actionsmenuitems" onClick={logout}>
                                     <p>Logout</p>
                                 </div>
                             </div>

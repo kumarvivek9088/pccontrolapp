@@ -2,7 +2,8 @@
 // const { MongoClient, ServerApiVersion } = require('mongodb');
 // import { MongoClient,ServerApiVersion } from "mongodb";
 import mongoose from "mongoose";
-const uri = "mongodb+srv://rajputvivek9088:6uCPxQAVzQmCLmzn@cluster0.1fqusrz.mongodb.net/?retryWrites=true&w=majority";
+// const uri = process.env.MONGO_URL;
+// console.log(uri);
 
 // Create a MongoClient with a MongoClientOptions object to set the Stable API version
 // const client = new MongoClient(uri, {
@@ -14,7 +15,7 @@ const uri = "mongodb+srv://rajputvivek9088:6uCPxQAVzQmCLmzn@cluster0.1fqusrz.mon
 // });
 
 async function dbConnect() {
-  mongoose.connect(uri,{
+  mongoose.connect(process.env.MONGO_URL,{
   }).then(()=>{
     console.log("Successfully connected to cloud MongoDb Atlas");
   })
