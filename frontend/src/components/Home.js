@@ -19,6 +19,7 @@ const Home = ()=>{
     
     // const authtoken = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyaWQiOiI2NWE2YzU2YzNmZGI2MmQwOTEyZTBlODciLCJlbWFpbCI6InZpdmVrQGdtYWlsLmNvbSIsIm5hbWUiOiJ2aXZlayIsImlhdCI6MTcwNjM2NjExOSwiZXhwIjoxNzA2NDUyNTE5fQ._SeIW9LyCtVzGQBaWrXC3e5ExTLQQDItBijat5IT6vQ'
     useEffect(()=>{
+        console.log("I'm in the  userroom api useeffect");
         axios.get(`${backendurl}/userrooms/`,{
             headers:{
                 Authorization: `Bearer ${authToken}`,
@@ -27,6 +28,9 @@ const Home = ()=>{
         }).then((res)=> {
             console.log(res.data.result);
             setuserRooms(res.data.result);
+            if (res.data.result.length >0){
+                document.getElementsByClassName("createroom")[0].style.display = 'none';
+            }
         })
         .catch((err)=>console.error(err));
         const socketInstance = io(backendurl);
@@ -43,32 +47,63 @@ const Home = ()=>{
         let homecontainerdiv = document.getElementsByClassName("homecontainer")[0];
         console.log(chatmenuboxdiv.offsetWidth ,homecontainerdiv.offsetWidth)
         if(document.getElementsByClassName("botchatbox")[0].style.display === 'none' || !document.getElementsByClassName("botchatbox")[0].style.display){
-            document.getElementById("chatheaderbotnamepid").innerHTML = botname;
-            let localhistory = JSON.parse(localStorage.getItem(`roomid${roomid}`));
-            if (localhistory === null){
+            if (roomId === roomid){
+                document.getElementsByClassName("botchatbox")[0].style.display='none';
                 setchatHistory([]);
+                setroomId(null);
+                socket.emit('leave',roomid);
             }else{
-                setchatHistory(localhistory);
-            }
-            console.log("this is room",roomid);
-            setroomId(roomid);
-            console.log("roomid",roomId);
-            if( roomid !== null){
-                socket.emit('join_room',{username :useremail,room : roomid});
-            }
-            if (chatmenuboxdiv.offsetWidth === homecontainerdiv.offsetWidth){
-                document.getElementsByClassName("botchatbox")[0].style.display='flex';
-                document.getElementsByClassName("menu")[0].style.display = 'none';
-                document.getElementsByClassName("overlaybox")[0].style.display = 'none';
-            }else{
-                document.getElementsByClassName("botchatbox")[0].style.display='flex';
+                document.getElementById("chatheaderbotnamepid").innerHTML = botname;
+                let localhistory = JSON.parse(localStorage.getItem(`roomid_${roomid}`));
+                if (localhistory === null){
+                    setchatHistory([]);
+                }else{
+                    setchatHistory(localhistory);
+                }
+                console.log("this is room",roomid);
+                setroomId(roomid);
+                console.log("roomid",roomId);
+                if( roomid !== null){
+                    socket.emit('join_room',{username :useremail,room : roomid});
+                }
+                if (chatmenuboxdiv.offsetWidth === homecontainerdiv.offsetWidth){
+                    document.getElementsByClassName("botchatbox")[0].style.display='flex';
+                    document.getElementsByClassName("menu")[0].style.display = 'none';
+                    document.getElementsByClassName("overlaybox")[0].style.display = 'none';
+                }else{
+                    document.getElementsByClassName("botchatbox")[0].style.display='flex';
+                }
             }
         }
         else{
-            document.getElementsByClassName("botchatbox")[0].style.display='none';
-            setchatHistory([]);
-            // setroomId("");
-            socket.emit('leave',roomid);
+            if (roomId==roomid){
+                document.getElementsByClassName("botchatbox")[0].style.display='none';
+                setchatHistory([]);
+                setroomId(null);
+                socket.emit('leave',roomid);
+            }
+            else{
+                document.getElementById("chatheaderbotnamepid").innerHTML = botname;
+                let localhistory = JSON.parse(localStorage.getItem(`roomid_${roomid}`));
+                if (localhistory === null){
+                    setchatHistory([]);
+                }else{
+                    setchatHistory(localhistory);
+                }
+                console.log("this is room",roomid);
+                setroomId(roomid);
+                console.log("roomid",roomId);
+                if( roomid !== null){
+                    socket.emit('join_room',{username :useremail,room : roomid});
+                }
+                if (chatmenuboxdiv.offsetWidth === homecontainerdiv.offsetWidth){
+                    document.getElementsByClassName("botchatbox")[0].style.display='flex';
+                    document.getElementsByClassName("menu")[0].style.display = 'none';
+                    document.getElementsByClassName("overlaybox")[0].style.display = 'none';
+                }else{
+                    document.getElementsByClassName("botchatbox")[0].style.display='flex';
+                }
+            }
         }
     }
     // useEffect(()=>{
@@ -79,6 +114,7 @@ const Home = ()=>{
         document.getElementsByClassName("menu")[0].style.display = 'flex';
         document.getElementsByClassName("overlaybox")[0].style.display = 'flex';
         console.log(roomId);
+        setroomId(null);
         socket.emit('leave',roomId);
     }
     const triggerdotmenu = ()=>{
@@ -123,7 +159,35 @@ const Home = ()=>{
     const sendMessage = ()=>{
         let message = document.getElementById("sendmessageinput").value;
         if (socket!==null && message.trim() !== ''){
-            socket.emit('send_message',{sender:useremail,room:roomId,message : message,type:"text"});
+            let d = new Date();
+            socket.emit('send_message',{sender:useremail,room:roomId,message : message,type:"text",sent_at:d});
+            document.getElementById("sendmessageinput").value = '';
+        }
+    }
+    const creatnewroombutton = ()=>{
+        let message = document.getElementById("createnewroomnameinput").value;
+        if(message.trim() !== ''){
+            axios.post(`${backendurl}/createroom`,
+                {
+                    name : message
+                },
+                {headers:{
+                    Authorization : `Bearer ${authToken}`,
+                    "Content-Type" : "Application/json",
+                }}
+            )
+            .then((response)=>{
+                if (response.status === 200){
+                    toast.success("Room created Successfull");
+                    setuserRooms(prevuserRooms=>[...prevuserRooms,response.data.result]);
+                }
+                else{
+                    toast.error(response.data.message)
+                }
+            })
+            .catch((e)=>{
+                toast.error(e);
+            })
         }
     }
     useEffect(()=>{
@@ -136,18 +200,37 @@ const Home = ()=>{
             socket.on('receive_message',(data)=>{
                 console.log("received message",data);
                 setchatHistory(prevchatHistory=>[...prevchatHistory,data]);
+                console.log(chatHistory);
             })
             return ()=> socket.off("receive_message");
-
+            
         }
         // }
     },[socket,roomId]);
+    useEffect(()=>{
+        if (chatHistory.length > 0){
+            localStorage.setItem(`roomid_${roomId}`,JSON.stringify(chatHistory));
+        }
+    },[chatHistory]);
     const logout = ()=>{
         localStorage.removeItem("authToken");
         localStorage.removeItem("useremail");
         toast.success("logout successfull");
         setauthToken(null);
         // navigate('/login');
+    }
+    const copyroomid = ()=>{
+        console.log("room id in copy function",roomId);
+        try{
+            navigator.clipboard.writeText(roomId);
+            toast.info("Room id copied to clipboard");
+        }
+        catch(e){
+            console.log(e);
+            let d = document.getElementById("sendmessageinput");
+            d.value = roomId;
+            toast.info("Check message input 🙃");
+        }
     }
     return (
         <>
@@ -212,10 +295,28 @@ const Home = ()=>{
                                         <div className="botname-lastmessage">
                                             <div className="botname">
                                                 <p>{room.name}</p>
-                                                <span>{new Date(room.createdAt).toLocaleDateString()}</span>
+                                                {/* <span>{new Date(room.createdAt).toLocaleDateString()}</span> */}
+                                                {
+                                                    JSON.parse(localStorage.getItem(`roomid_${room.roomid}`)) && JSON.parse(localStorage.getItem(`roomid_${room.roomid}`)).length>0?(
+                                                        (new Date(JSON.parse(localStorage.getItem(`roomid_${room.roomid}`)).at(-1).sent_at).toLocaleDateString() === new Date().toLocaleDateString()?(
+                                                            <span>{new Date(JSON.parse(localStorage.getItem(`roomid_${room.roomid}`)).at(-1).sent_at).toLocaleTimeString()}</span>
+                                                        ):(
+                                                            <span>{new Date(JSON.parse(localStorage.getItem(`roomid_${room.roomid}`)).at(-1).sent_at).toLocaleDateString()}</span>
+                                                        ))
+                                                    ):(
+                                                        <span>{new Date(room.createdAt).toLocaleDateString()}</span>
+                                                    )
+                                                }
                                             </div>
                                             <div className="lastmessage">
-                                                <p>{room.name} is there...</p>
+                                                {/* <p>{room.name} is there...</p> */}
+                                                {
+                                                    JSON.parse(localStorage.getItem(`roomid_${room.roomid}`)) && JSON.parse(localStorage.getItem(`roomid_${room.roomid}`)).length>0?(
+                                                        <p>{JSON.parse(localStorage.getItem(`roomid_${room.roomid}`)).at(-1).message}</p>
+                                                    ):(
+                                                        <p>{room.name} is there...</p>
+                                                    )
+                                                }
                                             </div>
                                         </div>
                                     </div>
@@ -240,8 +341,8 @@ const Home = ()=>{
                                 <span class="material-symbols-outlined mobilescreencreateroomclose" onClick={cancelcreateroom} >chevron_left</span>
                                 <span class="material-symbols-outlined bigscreencreateroomclose" onClick={cancelbigscreencreateroom} >close</span>
                                 <p>create a new room</p>
-                                <input type="text" required placeholder="enter your bot name"></input>
-                                <button>Create</button>
+                                <input type="text" required placeholder="enter your bot name" id="createnewroomnameinput"></input>
+                                <button onClick={creatnewroombutton}>Create</button>
                                 {/* <button>Cancel</button> */}
                             </div>
                         </div>
@@ -267,7 +368,7 @@ const Home = ()=>{
                                         </div>
                                         <div  style={{width:"60%",height:"100%",position:"relative"}}>
                                             <div id = "dotmenucontainer" className="dotmenucontainer">
-                                                <div className="dotmenuitems">
+                                                <div className="dotmenuitems" onClick={copyroomid}>
                                                     <p>Get Roomid</p>
                                                 </div>
                                             </div>
@@ -317,7 +418,7 @@ const Home = ()=>{
                                                             <p>{history.message}</p>
                                                         </div>    
                                                     ):(
-                                                        <img src = "" />
+                                                        <img className="receivemessageimage" src = {`data:image/png;base64,${history.message}`} />
                                                     )}
                                                 </div>
                                             ):(
@@ -327,7 +428,7 @@ const Home = ()=>{
                                                             <p>{history.message}</p>
                                                         </div>
                                                     ):(
-                                                        <img src="" />
+                                                        <img  className="receivemessageimage" src={`data:image/png;base64,${history.message}`} />
                                                     )}
                                                 </div>
                                             )
@@ -337,7 +438,11 @@ const Home = ()=>{
                                 </div>
                                 <div className="messageinputbox">
                                     <div className="submessageinputbox">
-                                        <input type="text"  id = "sendmessageinput" placeholder="message"/>
+                                        <input type="text"  id = "sendmessageinput" placeholder="message" onKeyDown={(event)=>{
+                                            if (event.key === 'Enter'){
+                                                sendMessage();
+                                            }
+                                        }}/>
                                         <span class="material-symbols-outlined" onClick={sendMessage}>send</span>
                                     </div>
                                 </div>

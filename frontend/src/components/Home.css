@@ -297,6 +297,9 @@ span{
 .dotmenuitems p:active{
     transform: scale(0.8);
 }
+.dotmenuitems:active{
+    transform: scale(0.8);
+}
 .lastmessage p{
     margin: 0;
     padding: 0;
@@ -660,6 +663,7 @@ span{
         background-color: white;
         border: 1px solid gray;
         border-radius: 10%;
+        display: none;
     }
     .overlay-symbol{
         /* background-color: green; */

@@ -15,7 +15,7 @@ const app = express();
 const port = 3001;
 app.use(express.json());
 app.use(cors());
-var allowlist = ['http://localhost:3000','http://127.0.0.1:3000'];
+var allowlist = ['http://localhost:3000','http://127.0.0.1:3000','http://192.168.146.4:3000'];
 var corsConfig = function (req,callback){
     var corsOptions;
     if (allowlist.indexOf(req.header('Origin')) !== -1){
@@ -44,7 +44,7 @@ app.get('/test',(req,res)=>{
 const server = http.createServer(app);
 const io = new Server(server,{
     cors: {
-        origin : ['http://localhost:3000','http://127.0.0.1:3000'],
+        origin : ['http://localhost:3000','http://127.0.0.1:3000','http://192.168.146.4:3000'],
         methods : ['GET','POST'],
     },
 });

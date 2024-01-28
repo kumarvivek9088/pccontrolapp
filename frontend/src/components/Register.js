@@ -2,7 +2,7 @@ import React from "react";
 import  './Register.css';
 import { useState } from "react";
 import axios from "axios";
-import {toast,ToastContainer} from "react-toastify";
+import {toast} from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { useAuth } from "../context/Authorization";
 const Register = () =>{
