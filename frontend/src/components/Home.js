@@ -253,12 +253,12 @@ const Home = ()=>{
                             </div>
                             <div className="botsmenu">
                                 <h1>Bots</h1>
-                                <div className="userbots">
+                                {/*<div className="userbots">
                                     <div className="botpic">
                                         <li className="material-symbols-outlined chatheaderbotpic">account_circle</li>
-                                        {/* <div className="profilepic">
+                                         <div className="profilepic">
 
-                                        </div> */}
+                                        </div> 
                                     </div>
                                     <div className="botname-lastmessage"onClick={enablechatdiv}>
                                         <div className="botname"> 
@@ -273,9 +273,9 @@ const Home = ()=>{
                                 <div className="userbots">
                                     <div className="botpic">
                                         <li className="material-symbols-outlined chatheaderbotpic">account_circle</li>
-                                        {/* <div className="profilepic">
+                                         <div className="profilepic">
                                                 
-                                            </div> */}
+                                            </div> 
                                     </div>
                                     <div className="botname-lastmessage">
                                         <div className="botname">
@@ -286,7 +286,7 @@ const Home = ()=>{
                                             <p>completed sir</p>
                                         </div>
                                     </div>
-                                </div>
+                                </div> */}
                                 {userRooms.map((room)=>(
                                     <div key = {room.roomid} className="userbots" onClick={()=>enablechatdiv(room.name,room.roomid)}>
                                         <div className="botpic">
