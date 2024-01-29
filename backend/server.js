@@ -15,7 +15,7 @@ const app = express();
 const port = 3001;
 app.use(express.json());
 app.use(cors());
-var allowlist = ['http://localhost:3000','http://127.0.0.1:3000','http://192.168.146.4:3000'];
+var allowlist = ['http://localhost:3000','http://127.0.0.1:3000','http://192.168.146.4:3000','https://pccontrolapp.vercel.app'];
 var corsConfig = function (req,callback){
     var corsOptions;
     if (allowlist.indexOf(req.header('Origin')) !== -1){
