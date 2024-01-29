@@ -15,7 +15,7 @@ import mongoose from "mongoose";
 // });
 
 async function dbConnect() {
-  mongoose.connect(process.env.MONGO_URL,{
+  mongoose.connect(process.env.MONGODB_URI,{
   }).then(()=>{
     console.log("Successfully connected to cloud MongoDb Atlas");
   })
