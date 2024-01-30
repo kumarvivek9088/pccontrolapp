@@ -47,6 +47,7 @@ const io = new Server(server,{
         origin : allowlist,
         methods : ['GET','POST'],
     },
+    maxHttpBufferSize : 1e7
 });
 io.on("connection",(socket)=>{
     console.log('user connected' ,socket.id);
