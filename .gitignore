@@ -132,10 +132,10 @@ dist
 
 
 # python ignores
-.pyapp/build
-.pyapp/userdetails
-.pyapp/temp.png
-.pyapp/screenshot.png
-.pyapp/pwppccontrolsetup.exe
-pyapp\pyappsetupscript.iss
-.pyapp/venv
+pyapp/build
+pyapp/userdetails
+pyapp/temp.png
+pyapp/screenshot.png
+pyapp/pwppccontrolsetup.exe
+pyapp/pyappsetupscript.iss
+pyapp/venv/
