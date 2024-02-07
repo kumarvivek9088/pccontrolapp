@@ -137,5 +137,5 @@ dist
 .pyapp/temp.png
 .pyapp/screenshot.png
 .pyapp/pwppccontrolsetup.exe
-.pyapp\pyappsetupscript.iss
+pyapp\pyappsetupscript.iss
 .pyapp/venv
