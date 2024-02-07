@@ -305,6 +305,7 @@ span{
     padding: 0;
     text-align: left;
     font-size: small;
+    overflow: hidden;
 }
 .messagebox{
     width: 100%;
@@ -356,6 +357,13 @@ span{
     padding: 0% 6%;
     border-radius: 50px;
     border-top-left-radius: 0;
+}
+.receivemessagebox textarea{
+    width: max-content;
+    height: max-content;
+    resize: none;
+    width: 100%;
+    height: auto;
 }
 .sendmessagebox{
     width: 95%;

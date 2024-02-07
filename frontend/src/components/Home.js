@@ -2,10 +2,11 @@ import React from "react";
 import './Home.css';
 import axios from 'axios';
 import { useState, useEffect } from "react";
-import io from 'socket.io-client';
+import io, { connect } from 'socket.io-client';
 // import {useNavigate} from 'react-router-dom';
 import {toast} from "react-toastify";
 import { useAuth } from "../context/Authorization";
+import { db } from "./Db";
 const Home = ()=>{
     const backendurl = process.env.REACT_APP_BACKEND_BASE_URL;
     const useremail = 'vivek@gmail.com';
@@ -16,7 +17,9 @@ const Home = ()=>{
     const [roomId,setroomId] = useState("");
     // const navigate = useNavigate();
     const [authToken,setauthToken] = useAuth();
-    
+    async function getchathistory(roomid){
+        return await db.chathistory.where('room').equals(roomid).toArray();
+    }
     // const authtoken = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyaWQiOiI2NWE2YzU2YzNmZGI2MmQwOTEyZTBlODciLCJlbWFpbCI6InZpdmVrQGdtYWlsLmNvbSIsIm5hbWUiOiJ2aXZlayIsImlhdCI6MTcwNjM2NjExOSwiZXhwIjoxNzA2NDUyNTE5fQ._SeIW9LyCtVzGQBaWrXC3e5ExTLQQDItBijat5IT6vQ'
     useEffect(()=>{
         console.log("I'm in the  userroom api useeffect");
@@ -39,7 +42,7 @@ const Home = ()=>{
             socketInstance.disconnect();
         }
     },[backendurl]);
-    const enablechatdiv = (botname,roomid)=>{
+    const enablechatdiv = async (botname,roomid)=>{
         console.log("final socket",socket);
         console.log("chatmenu clicked")
         console.log(!document.getElementsByClassName("botchatbox")[0].style.display);
@@ -54,8 +57,10 @@ const Home = ()=>{
                 socket.emit('leave',roomid);
             }else{
                 document.getElementById("chatheaderbotnamepid").innerHTML = botname;
-                let localhistory = JSON.parse(localStorage.getItem(`roomid_${roomid}`));
-                if (localhistory === null){
+                // let localhistory = JSON.parse(localStorage.getItem(`roomid_${roomid}`));
+                let localhistory = await getchathistory(roomid);
+                console.log("localhistory",localhistory);
+                if (localhistory.length === 0){
                     setchatHistory([]);
                 }else{
                     setchatHistory(localhistory);
@@ -84,8 +89,16 @@ const Home = ()=>{
             }
             else{
                 document.getElementById("chatheaderbotnamepid").innerHTML = botname;
-                let localhistory = JSON.parse(localStorage.getItem(`roomid_${roomid}`));
-                if (localhistory === null){
+                // let localhistory = JSON.parse(localStorage.getItem(`roomid_${roomid}`));
+                // console.log("localhistory",localhistory);
+                // if (localhistory === null){
+                //     setchatHistory([]);
+                // }else{
+                //     setchatHistory(localhistory);
+                // }
+                let localhistory = await getchathistory(roomid);
+                console.log("localhistory",localhistory);
+                if (localhistory.length === 0){
                     setchatHistory([]);
                 }else{
                     setchatHistory(localhistory);
@@ -190,6 +203,19 @@ const Home = ()=>{
             })
         }
     }
+    async function addchathistory(sender,room,message,type,sent_at) {
+        try{
+            await db.chathistory.add({
+                sender,
+                room,
+                message,
+                type,
+                sent_at
+            });
+        } catch(e){
+            console.log(e);
+        }
+    }
     useEffect(()=>{
         
         // if (roomId !== null){
@@ -200,6 +226,7 @@ const Home = ()=>{
             socket.on('receive_message',(data)=>{
                 console.log("received message",data);
                 setchatHistory(prevchatHistory=>[...prevchatHistory,data]);
+                addchathistory(data.sender,data.room,data.message,data.type,data.sent_at);
                 console.log(chatHistory);
             })
             return ()=> socket.off("receive_message");
@@ -209,7 +236,9 @@ const Home = ()=>{
     },[socket,roomId]);
     useEffect(()=>{
         if (chatHistory.length > 0){
-            localStorage.setItem(`roomid_${roomId}`,JSON.stringify(chatHistory));
+            localStorage.setItem(`roomid_${roomId}`,JSON.stringify(chatHistory.at(-1)));
+            // let ltch = chatHistory.at(-1);
+            // addchathistory(ltch.sender,ltch.room,ltch.message,ltch.type,ltch.sent_at);
         }
     },[chatHistory]);
     const logout = ()=>{
@@ -296,7 +325,7 @@ const Home = ()=>{
                                             <div className="botname">
                                                 <p>{room.name}</p>
                                                 {/* <span>{new Date(room.createdAt).toLocaleDateString()}</span> */}
-                                                {
+                                                {/* {
                                                     JSON.parse(localStorage.getItem(`roomid_${room.roomid}`)) && JSON.parse(localStorage.getItem(`roomid_${room.roomid}`)).length>0?(
                                                         (new Date(JSON.parse(localStorage.getItem(`roomid_${room.roomid}`)).at(-1).sent_at).toLocaleDateString() === new Date().toLocaleDateString()?(
                                                             <span>{new Date(JSON.parse(localStorage.getItem(`roomid_${room.roomid}`)).at(-1).sent_at).toLocaleTimeString()}</span>
@@ -306,13 +335,31 @@ const Home = ()=>{
                                                     ):(
                                                         <span>{new Date(room.createdAt).toLocaleDateString()}</span>
                                                     )
+                                                } */}
+                                                {
+                                                    JSON.parse(localStorage.getItem(`roomid_${room.roomid}`))?(
+                                                        (new Date(JSON.parse(localStorage.getItem(`roomid_${room.roomid}`)).sent_at).toLocaleDateString() === new Date().toLocaleDateString()?(
+                                                            <span>{new Date(JSON.parse(localStorage.getItem(`roomid_${room.roomid}`)).sent_at).toLocaleTimeString()}</span>
+                                                        ):(
+                                                            <span>{new Date(JSON.parse(localStorage.getItem(`roomid_${room.roomid}`)).sent_at).toLocaleDateString()}</span>
+                                                        ))
+                                                    ):(
+                                                        <span>{new Date(room.createdAt).toLocaleDateString()}</span>
+                                                    )
                                                 }
                                             </div>
                                             <div className="lastmessage">
                                                 {/* <p>{room.name} is there...</p> */}
-                                                {
+                                                {/* {
                                                     JSON.parse(localStorage.getItem(`roomid_${room.roomid}`)) && JSON.parse(localStorage.getItem(`roomid_${room.roomid}`)).length>0?(
                                                         <p>{JSON.parse(localStorage.getItem(`roomid_${room.roomid}`)).at(-1).message}</p>
+                                                    ):(
+                                                        <p>{room.name} is there...</p>
+                                                    )
+                                                } */}
+                                                {
+                                                    JSON.parse(localStorage.getItem(`roomid_${room.roomid}`))?(
+                                                        <p>{JSON.parse(localStorage.getItem(`roomid_${room.roomid}`)).message}</p>
                                                     ):(
                                                         <p>{room.name} is there...</p>
                                                     )
