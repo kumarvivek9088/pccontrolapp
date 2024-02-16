@@ -393,7 +393,7 @@ const Home = ()=>{
                                 {/* <button>Cancel</button> */}
                             </div>
                         </div>
-                        <div className="botchatbox">
+                        <div className="botchatbox" style={{display:"none"}}>
                             <div className="chatheader">
                                 <div className="backarrow">
                                     <span class="material-symbols-outlined" onClick={back}>chevron_left</span>

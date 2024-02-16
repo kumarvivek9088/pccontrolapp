@@ -18,5 +18,5 @@ setup(
     version="0.1",
     description="pc control software",
     options={"build_exe": build_exe_options},
-    executables=[Executable("pccontrolapp.py", base=base)],
+    executables=[Executable("pccontrolapp.py", base=base,icon='favicon.ico')],
 )

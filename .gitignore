@@ -139,3 +139,6 @@ pyapp/screenshot.png
 pyapp/pwppccontrolsetup.exe
 pyapp/pyappsetupscript.iss
 pyapp/venv/
+pyapp/build_2/
+pyapp/pcControlapp_setup.exe
+pyapp/pcControlapp_setup_script.iss
